@@ -78,7 +78,7 @@ function PatientHome() {
         </div>
       </div>
 
-      <div className="mt-6 px-6">
+      <div className="-mx-6 mt-6 px-6">
         <div className="grid grid-cols-2 gap-3">
           {cards.map(({ to, label, emoji, icon: Icon, tone }) => (
             <Link
