@@ -6,10 +6,20 @@
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
+// GITHUB_PAGES=1 builds a fully static site under /digital-twin-1/ for GitHub Pages.
+const ghPages = process.env.GITHUB_PAGES === "1";
+
 export default defineConfig({
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
     server: { entry: "server" },
+    ...(ghPages && {
+      prerender: { enabled: true, crawlLinks: true, autoSubfolderIndex: true },
+    }),
   },
+  ...(ghPages && {
+    nitro: false, // TanStack Start's own build handles the static prerender
+    vite: { base: "/digital-twin-1/" },
+  }),
 });

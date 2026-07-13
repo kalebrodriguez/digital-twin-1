@@ -10,6 +10,8 @@ export const getRouter = () => {
     context: { queryClient },
     scrollRestoration: true,
     defaultPreloadStaleTime: 0,
+    // Honors vite `base` so the app works at /digital-twin-1/ on GitHub Pages
+    basepath: import.meta.env.BASE_URL,
   });
 
   return router;
