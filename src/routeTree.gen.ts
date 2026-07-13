@@ -9,8 +9,56 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TasksRouteImport } from './routes/tasks'
+import { Route as MessagesRouteImport } from './routes/messages'
+import { Route as MemoryBookRouteImport } from './routes/memory-book'
+import { Route as LostRouteImport } from './routes/lost'
+import { Route as EmergencyRouteImport } from './routes/emergency'
+import { Route as ContactsRouteImport } from './routes/contacts'
+import { Route as CheckinRouteImport } from './routes/checkin'
+import { Route as CaregiverRouteImport } from './routes/caregiver'
 import { Route as IndexRouteImport } from './routes/index'
 
+const TasksRoute = TasksRouteImport.update({
+  id: '/tasks',
+  path: '/tasks',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MessagesRoute = MessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MemoryBookRoute = MemoryBookRouteImport.update({
+  id: '/memory-book',
+  path: '/memory-book',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LostRoute = LostRouteImport.update({
+  id: '/lost',
+  path: '/lost',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmergencyRoute = EmergencyRouteImport.update({
+  id: '/emergency',
+  path: '/emergency',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactsRoute = ContactsRouteImport.update({
+  id: '/contacts',
+  path: '/contacts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckinRoute = CheckinRouteImport.update({
+  id: '/checkin',
+  path: '/checkin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CaregiverRoute = CaregiverRouteImport.update({
+  id: '/caregiver',
+  path: '/caregiver',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -19,28 +67,144 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/caregiver': typeof CaregiverRoute
+  '/checkin': typeof CheckinRoute
+  '/contacts': typeof ContactsRoute
+  '/emergency': typeof EmergencyRoute
+  '/lost': typeof LostRoute
+  '/memory-book': typeof MemoryBookRoute
+  '/messages': typeof MessagesRoute
+  '/tasks': typeof TasksRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/caregiver': typeof CaregiverRoute
+  '/checkin': typeof CheckinRoute
+  '/contacts': typeof ContactsRoute
+  '/emergency': typeof EmergencyRoute
+  '/lost': typeof LostRoute
+  '/memory-book': typeof MemoryBookRoute
+  '/messages': typeof MessagesRoute
+  '/tasks': typeof TasksRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/caregiver': typeof CaregiverRoute
+  '/checkin': typeof CheckinRoute
+  '/contacts': typeof ContactsRoute
+  '/emergency': typeof EmergencyRoute
+  '/lost': typeof LostRoute
+  '/memory-book': typeof MemoryBookRoute
+  '/messages': typeof MessagesRoute
+  '/tasks': typeof TasksRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/caregiver'
+    | '/checkin'
+    | '/contacts'
+    | '/emergency'
+    | '/lost'
+    | '/memory-book'
+    | '/messages'
+    | '/tasks'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/caregiver'
+    | '/checkin'
+    | '/contacts'
+    | '/emergency'
+    | '/lost'
+    | '/memory-book'
+    | '/messages'
+    | '/tasks'
+  id:
+    | '__root__'
+    | '/'
+    | '/caregiver'
+    | '/checkin'
+    | '/contacts'
+    | '/emergency'
+    | '/lost'
+    | '/memory-book'
+    | '/messages'
+    | '/tasks'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CaregiverRoute: typeof CaregiverRoute
+  CheckinRoute: typeof CheckinRoute
+  ContactsRoute: typeof ContactsRoute
+  EmergencyRoute: typeof EmergencyRoute
+  LostRoute: typeof LostRoute
+  MemoryBookRoute: typeof MemoryBookRoute
+  MessagesRoute: typeof MessagesRoute
+  TasksRoute: typeof TasksRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/tasks': {
+      id: '/tasks'
+      path: '/tasks'
+      fullPath: '/tasks'
+      preLoaderRoute: typeof TasksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/messages': {
+      id: '/messages'
+      path: '/messages'
+      fullPath: '/messages'
+      preLoaderRoute: typeof MessagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/memory-book': {
+      id: '/memory-book'
+      path: '/memory-book'
+      fullPath: '/memory-book'
+      preLoaderRoute: typeof MemoryBookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lost': {
+      id: '/lost'
+      path: '/lost'
+      fullPath: '/lost'
+      preLoaderRoute: typeof LostRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/emergency': {
+      id: '/emergency'
+      path: '/emergency'
+      fullPath: '/emergency'
+      preLoaderRoute: typeof EmergencyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contacts': {
+      id: '/contacts'
+      path: '/contacts'
+      fullPath: '/contacts'
+      preLoaderRoute: typeof ContactsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkin': {
+      id: '/checkin'
+      path: '/checkin'
+      fullPath: '/checkin'
+      preLoaderRoute: typeof CheckinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/caregiver': {
+      id: '/caregiver'
+      path: '/caregiver'
+      fullPath: '/caregiver'
+      preLoaderRoute: typeof CaregiverRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -53,17 +217,15 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CaregiverRoute: CaregiverRoute,
+  CheckinRoute: CheckinRoute,
+  ContactsRoute: ContactsRoute,
+  EmergencyRoute: EmergencyRoute,
+  LostRoute: LostRoute,
+  MemoryBookRoute: MemoryBookRoute,
+  MessagesRoute: MessagesRoute,
+  TasksRoute: TasksRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
