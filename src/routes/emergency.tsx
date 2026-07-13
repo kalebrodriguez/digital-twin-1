@@ -4,7 +4,7 @@ import { PhoneCall, MapPin, ShieldAlert } from "lucide-react";
 import { PatientShell } from "@/components/PatientShell";
 
 export const Route = createFileRoute("/emergency")({
-  head: () => ({ meta: [{ title: "Emergency — MindBridge" }, { name: "description", content: "One tap to get immediate help." }] }),
+  head: () => ({ meta: [{ title: "Emergency — DigitalTwin" }, { name: "description", content: "One tap to get immediate help." }] }),
   component: Emergency,
 });
 

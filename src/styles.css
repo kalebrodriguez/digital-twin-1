@@ -47,14 +47,14 @@
 
 :root {
   --radius: 1rem;
-  /* MindBridge palette */
+  /* DigitalTwin palette */
   --background: oklch(0.985 0.005 90);            /* #FAFAF7 */
   --foreground: oklch(0.30 0 0);                   /* #333333 */
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.30 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.30 0 0);
-  --primary: oklch(0.65 0.13 250);                 /* #4A90E2 */
+  --primary: oklch(0.71 0.14 255);                 /* #5CA3FF */
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.74 0.10 145);               /* #7FB77E */
   --secondary-foreground: oklch(1 0 0);

@@ -4,7 +4,7 @@ import { PatientShell } from "@/components/PatientShell";
 import { HeartHandshake } from "lucide-react";
 
 export const Route = createFileRoute("/checkin")({
-  head: () => ({ meta: [{ title: "Check In — MindBridge" }, { name: "description", content: "A gentle way to share how you're feeling today." }] }),
+  head: () => ({ meta: [{ title: "Check In — DigitalTwin" }, { name: "description", content: "A gentle way to share how you're feeling today." }] }),
   component: CheckIn,
 });
 
@@ -50,7 +50,7 @@ function CheckIn() {
             </>
           ) : (
             <>
-              <p className="font-display text-xl">Thank you for sharing, John. 💛</p>
+              <p className="font-display text-xl">Thank you for sharing, Margaret. 💛</p>
               <p className="mt-1 text-sm text-muted-foreground">Sarah will see how you feel.</p>
             </>
           )}

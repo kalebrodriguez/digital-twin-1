@@ -5,7 +5,7 @@ import { PatientShell } from "@/components/PatientShell";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "MindBridge — Home" },
+      { title: "DigitalTwin — Home" },
       { name: "description", content: "A calm home screen that shows what's next, how you're feeling, and the people who love you." },
     ],
   }),
@@ -40,7 +40,7 @@ function PatientHome() {
           <span className="flex items-center gap-1"><Cloud className="h-4 w-4" /> 68° Sunny</span>
         </div>
         <h1 className="mt-3 font-display text-3xl font-semibold leading-tight">
-          Good morning,<br />John <span className="inline-block">👋</span>
+          Good morning,<br />Margaret <span className="inline-block">👋</span>
         </h1>
         <p className="mt-1 text-muted-foreground">{date}</p>
 

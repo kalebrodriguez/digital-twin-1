@@ -3,11 +3,12 @@ import {
   Bell, Plus, Pill, Calendar, MessageSquareHeart, MapPin, Battery,
   HeartPulse, PhoneCall, Video, CheckCircle2, AlertTriangle, Mic, ChevronRight,
 } from "lucide-react";
+import { completeTask, useDayTasks } from "@/lib/dayStore";
 
 export const Route = createFileRoute("/caregiver")({
   head: () => ({
     meta: [
-      { title: "Caregiver Dashboard — MindBridge" },
+      { title: "Caregiver Dashboard — DigitalTwin" },
       { name: "description", content: "Everything you need to gently support your loved one, in one calm dashboard." },
     ],
   }),
@@ -15,6 +16,10 @@ export const Route = createFileRoute("/caregiver")({
 });
 
 function Caregiver() {
+  const tasks = useDayTasks();
+  const done = tasks.filter((t) => t.status === "done").length;
+  const skipped = tasks.filter((t) => t.status === "skipped");
+  const ok = skipped.length === 0;
   return (
     <div className="min-h-dvh bg-background">
       {/* Top bar */}
@@ -23,14 +28,16 @@ function Caregiver() {
           <div className="flex items-center gap-3">
             <div className="grid h-9 w-9 place-items-center rounded-xl bg-primary text-primary-foreground font-display text-lg font-bold">M</div>
             <div>
-              <p className="font-display text-lg font-semibold leading-tight">MindBridge</p>
+              <p className="font-display text-lg font-semibold leading-tight">DigitalTwin</p>
               <p className="text-xs text-muted-foreground">Caregiver dashboard</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <button className="relative rounded-full border border-border bg-card p-2">
               <Bell className="h-5 w-5" />
-              <span className="absolute -right-0.5 -top-0.5 grid h-4 w-4 place-items-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">3</span>
+              {!ok && (
+                <span className="absolute -right-0.5 -top-0.5 grid h-4 w-4 place-items-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">{skipped.length}</span>
+              )}
             </button>
             <Link to="/" className="rounded-full bg-accent px-4 py-2 text-sm font-semibold">← Patient view</Link>
           </div>
@@ -42,16 +49,18 @@ function Caregiver() {
         <section className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
           <div className="rounded-3xl bg-gradient-to-br from-primary to-[oklch(0.68_0.11_220)] p-6 text-primary-foreground shadow-[var(--shadow-card)]">
             <div className="flex items-center gap-4">
-              <div className="grid h-16 w-16 place-items-center rounded-2xl bg-white/20 font-display text-2xl font-bold">J</div>
+              <div className="grid h-16 w-16 place-items-center rounded-2xl bg-white/20 font-display text-2xl font-bold">M</div>
               <div className="flex-1">
                 <p className="text-xs uppercase tracking-wider opacity-80">Caring for</p>
-                <p className="font-display text-2xl font-semibold">John Whitaker</p>
-                <p className="text-sm opacity-90">Dad · 78 · Early-stage Alzheimer's</p>
+                <p className="font-display text-2xl font-semibold">Margaret Whitaker</p>
+                <p className="text-sm opacity-90">Mom · 78 · Early-stage Alzheimer's</p>
               </div>
-              <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold">Doing well today</span>
+              <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold">
+                {ok ? "Doing well today" : "Needs a check-in"}
+              </span>
             </div>
             <div className="mt-6 grid grid-cols-4 gap-3 text-sm">
-              <Stat label="Reminders done" value="3/7" icon={CheckCircle2} />
+              <Stat label="Reminders done" value={`${done}/${tasks.length}`} icon={CheckCircle2} />
               <Stat label="Mood" value="🙂 Okay" icon={HeartPulse} />
               <Stat label="Battery" value="72%" icon={Battery} />
               <Stat label="Last seen" value="Elm Park" icon={MapPin} />
@@ -59,14 +68,33 @@ function Caregiver() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <div className="rounded-3xl border border-destructive/20 bg-[oklch(0.97_0.03_25)] p-5">
-              <div className="flex items-center gap-2 text-destructive">
-                <AlertTriangle className="h-5 w-5" />
-                <p className="font-display text-lg font-semibold">1 alert</p>
+            {ok ? (
+              <div className="rounded-3xl border border-secondary/20 bg-[oklch(0.96_0.05_145)] p-5">
+                <div className="flex items-center gap-2 text-secondary">
+                  <CheckCircle2 className="h-5 w-5" />
+                  <p className="font-display text-lg font-semibold">All on track</p>
+                </div>
+                <p className="mt-2 text-sm">Mom is keeping up with her day. No alerts right now.</p>
               </div>
-              <p className="mt-2 text-sm">John skipped his 10:00 walk reminder.</p>
-              <button className="mt-3 rounded-full bg-destructive px-4 py-2 text-sm font-bold text-destructive-foreground">Check in with him</button>
-            </div>
+            ) : (
+              <div className="rounded-3xl border border-destructive/20 bg-[oklch(0.97_0.03_25)] p-5">
+                <div className="flex items-center gap-2 text-destructive">
+                  <AlertTriangle className="h-5 w-5" />
+                  <p className="font-display text-lg font-semibold">
+                    {skipped.length} alert{skipped.length > 1 ? "s" : ""}
+                  </p>
+                </div>
+                <p className="mt-2 text-sm">
+                  Mom skipped: {skipped.map((t) => `${t.title} (${t.time})`).join(", ")}.
+                </p>
+                <button
+                  onClick={() => skipped.forEach((t) => completeTask(t.id))}
+                  className="mt-3 rounded-full bg-destructive px-4 py-2 text-sm font-bold text-destructive-foreground"
+                >
+                  Check in with her
+                </button>
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-3">
               <button className="flex items-center justify-center gap-2 rounded-2xl bg-secondary py-3 font-bold text-secondary-foreground">
                 <PhoneCall className="h-4 w-4" /> Call
@@ -87,34 +115,33 @@ function Caregiver() {
             className="lg:col-span-2"
           >
             <ul className="divide-y divide-border">
-              {[
-                { time: "7:45 AM", title: "Morning medicine", icon: Pill, done: true },
-                { time: "8:00 AM", title: "Breakfast", icon: Calendar, done: true },
-                { time: "8:30 AM", title: "Brush teeth", icon: Calendar, done: true },
-                { time: "10:00 AM", title: "Short walk", icon: Calendar, done: false, skipped: true },
-                { time: "12:30 PM", title: "Lunch with Sarah", icon: Calendar, done: false },
-                { time: "3:00 PM", title: "Dr. Lee — video visit", icon: Video, done: false },
-                { time: "7:00 PM", title: "Evening medicine", icon: Pill, done: false },
-              ].map((it) => (
-                <li key={it.time} className="flex items-center gap-3 py-3">
-                  <span className="w-20 text-xs font-semibold text-muted-foreground">{it.time}</span>
-                  <span className={`grid h-9 w-9 place-items-center rounded-xl ${it.done ? "bg-[oklch(0.94_0.08_145)] text-secondary" : it.skipped ? "bg-[oklch(0.95_0.06_25)] text-destructive" : "bg-accent text-accent-foreground"}`}>
-                    <it.icon className="h-4 w-4" />
-                  </span>
-                  <span className="flex-1 text-sm font-semibold">{it.title}</span>
-                  {it.done && <span className="rounded-full bg-secondary/15 px-2 py-0.5 text-[11px] font-bold text-secondary">Done</span>}
-                  {it.skipped && <span className="rounded-full bg-destructive/15 px-2 py-0.5 text-[11px] font-bold text-destructive">Skipped</span>}
-                  {!it.done && !it.skipped && <ChevronRight className="h-4 w-4 text-muted-foreground" />}
-                </li>
-              ))}
+              {tasks.map((it) => {
+                const isDone = it.status === "done";
+                const isSkipped = it.status === "skipped";
+                const isNow = it.status === "next";
+                const Icon = it.title.toLowerCase().includes("medicine") ? Pill : Calendar;
+                return (
+                  <li key={it.id} className="flex items-center gap-3 py-3">
+                    <span className="w-20 text-xs font-semibold text-muted-foreground">{it.time}</span>
+                    <span className={`grid h-9 w-9 place-items-center rounded-xl ${isDone ? "bg-[oklch(0.94_0.08_145)] text-secondary" : isSkipped ? "bg-[oklch(0.95_0.06_25)] text-destructive" : "bg-accent text-accent-foreground"}`}>
+                      <Icon className="h-4 w-4" />
+                    </span>
+                    <span className="flex-1 text-sm font-semibold">{it.title}</span>
+                    {isDone && <span className="rounded-full bg-secondary/15 px-2 py-0.5 text-[11px] font-bold text-secondary">Done</span>}
+                    {isSkipped && <span className="rounded-full bg-destructive/15 px-2 py-0.5 text-[11px] font-bold text-destructive">Skipped</span>}
+                    {isNow && <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[11px] font-bold text-primary">Now</span>}
+                    {!isDone && !isSkipped && !isNow && <ChevronRight className="h-4 w-4 text-muted-foreground" />}
+                  </li>
+                );
+              })}
             </ul>
           </Card>
 
           {/* Send message */}
           <Card title="Send a note" action={<MessageSquareHeart className="h-5 w-5 text-primary" />}>
-            <p className="text-sm text-muted-foreground">Warm words show up on John's home screen.</p>
+            <p className="text-sm text-muted-foreground">Warm words show up on Margaret's home screen.</p>
             <textarea
-              defaultValue="Hi Dad, I'll be over at 12:30 with your favorite soup. 💛"
+              defaultValue="Hi Mom, I'll be over at 12:30 with your favorite soup. 💛"
               className="mt-3 h-28 w-full resize-none rounded-2xl border border-border bg-background p-3 text-sm outline-none focus:border-primary"
             />
             <div className="mt-3 flex items-center gap-2">
@@ -183,7 +210,7 @@ function Caregiver() {
         </section>
 
         <p className="mt-10 text-center text-xs text-muted-foreground">
-          MindBridge — Helping memories stay connected.
+          DigitalTwin — Helping memories stay connected.
         </p>
       </main>
     </div>

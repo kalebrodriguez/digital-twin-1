@@ -3,7 +3,7 @@ import { Phone, Video, MessageSquareHeart } from "lucide-react";
 import { PatientShell } from "@/components/PatientShell";
 
 export const Route = createFileRoute("/contacts")({
-  head: () => ({ meta: [{ title: "Family — MindBridge" }, { name: "description", content: "One tap to reach the people who love you." }] }),
+  head: () => ({ meta: [{ title: "Family — DigitalTwin" }, { name: "description", content: "One tap to reach the people who love you." }] }),
   component: Contacts,
 });
 

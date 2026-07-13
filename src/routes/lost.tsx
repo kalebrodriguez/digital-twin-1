@@ -4,7 +4,7 @@ import { Compass, MapPin } from "lucide-react";
 import { PatientShell } from "@/components/PatientShell";
 
 export const Route = createFileRoute("/lost")({
-  head: () => ({ meta: [{ title: "I'm Lost — MindBridge" }, { name: "description", content: "A calm way to ask for a little guidance." }] }),
+  head: () => ({ meta: [{ title: "I'm Lost — DigitalTwin" }, { name: "description", content: "A calm way to ask for a little guidance." }] }),
   component: Lost,
 });
 

@@ -2,41 +2,23 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Check, X, Volume2, CheckCircle2 } from "lucide-react";
 import { PatientShell } from "@/components/PatientShell";
+import { completeTask, skipTask, useDayTasks } from "@/lib/dayStore";
 
 export const Route = createFileRoute("/tasks")({
-  head: () => ({ meta: [{ title: "Today — MindBridge" }, { name: "description", content: "Your day, one gentle step at a time." }] }),
+  head: () => ({ meta: [{ title: "Today — DigitalTwin" }, { name: "description", content: "Your day, one gentle step at a time." }] }),
   component: TasksPage,
 });
 
-type Task = {
-  id: string;
-  emoji: string;
-  title: string;
-  time: string;
-  voice: string;
-  status: "done" | "next" | "later";
-};
-
-const initial: Task[] = [
-  { id: "1", emoji: "☀️", title: "Good morning", time: "7:30 AM", voice: "Time to wake up gently.", status: "done" },
-  { id: "2", emoji: "💊", title: "Morning medicine", time: "7:45 AM", voice: "Take your blue pill with water.", status: "done" },
-  { id: "3", emoji: "🥣", title: "Eat breakfast", time: "8:00 AM", voice: "Sarah made oatmeal for you.", status: "done" },
-  { id: "4", emoji: "🦷", title: "Brush your teeth", time: "8:30 AM", voice: "Hi John, it's time to brush your teeth.", status: "next" },
-  { id: "5", emoji: "🚶", title: "A short walk", time: "10:00 AM", voice: "A little fresh air feels wonderful.", status: "later" },
-  { id: "6", emoji: "💧", title: "Drink water", time: "11:00 AM", voice: "A glass of water keeps you strong.", status: "later" },
-  { id: "7", emoji: "🍲", title: "Lunch with Sarah", time: "12:30 PM", voice: "Sarah will call you at lunchtime.", status: "later" },
-];
-
 function TasksPage() {
-  const [tasks, setTasks] = useState(initial);
+  const tasks = useDayTasks();
   const [celebrate, setCelebrate] = useState<string | null>(null);
 
   const complete = (id: string) => {
-    setTasks((t) => t.map((x) => (x.id === id ? { ...x, status: "done" } : x)));
+    completeTask(id);
     setCelebrate(id);
     setTimeout(() => setCelebrate(null), 1500);
   };
-  const skip = (id: string) => setTasks((t) => t.map((x) => (x.id === id ? { ...x, status: "later" } : x)));
+  const skip = (id: string) => skipTask(id);
 
   const next = tasks.find((t) => t.status === "next") ?? tasks.find((t) => t.status === "later");
   const done = tasks.filter((t) => t.status === "done").length;
@@ -106,7 +88,10 @@ function TasksPage() {
               <p className={`font-semibold ${t.status === "done" ? "line-through" : ""}`}>{t.title}</p>
               <p className="text-xs text-muted-foreground">{t.time}</p>
             </div>
-            {t.status === "later" && (
+            {t.status === "skipped" && (
+              <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-[11px] font-bold text-destructive">Skipped</span>
+            )}
+            {(t.status === "later" || t.status === "skipped") && (
               <button
                 onClick={() => complete(t.id)}
                 className="rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary"

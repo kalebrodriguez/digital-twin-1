@@ -3,12 +3,12 @@ import { Volume2 } from "lucide-react";
 import { PatientShell } from "@/components/PatientShell";
 
 export const Route = createFileRoute("/messages")({
-  head: () => ({ meta: [{ title: "Messages — MindBridge" }, { name: "description", content: "Warm notes from the people who love you." }] }),
+  head: () => ({ meta: [{ title: "Messages — DigitalTwin" }, { name: "description", content: "Warm notes from the people who love you." }] }),
   component: Messages,
 });
 
 const msgs = [
-  { from: "Sarah", when: "This morning", text: "Good morning Dad! Today is Tuesday. I'll come by at 12:30 for lunch. 💛" },
+  { from: "Sarah", when: "This morning", text: "Good morning Mom! Today is Tuesday. I'll come by at 12:30 for lunch. 💛" },
   { from: "Michael", when: "Yesterday", text: "Proud of you for finishing your walk yesterday." },
   { from: "Emma", when: "Sunday", text: "Grandpa!! I drew you a picture — Mom will bring it over." },
 ];

@@ -45,10 +45,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { title: "MindBridge — Helping memories stay connected" },
+      { title: "DigitalTwin — Helping memories stay connected" },
       { name: "description", content: "A calm, simple companion app for people living with memory loss — and the people who care for them." },
       { name: "theme-color", content: "#FAFAF7" },
-      { property: "og:title", content: "MindBridge — Helping memories stay connected" },
+      { property: "og:title", content: "DigitalTwin — Helping memories stay connected" },
       { property: "og:description", content: "A calm, simple companion app for people living with memory loss — and the people who care for them." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
