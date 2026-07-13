@@ -34,7 +34,7 @@ function PatientHome() {
 
   return (
     <PatientShell>
-      <div className="px-6 pt-12">
+      <div className="-mx-6 -mt-2 px-6 pt-10">
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <span className="font-semibold">{time}</span>
           <span className="flex items-center gap-1"><Cloud className="h-4 w-4" /> 68° Sunny</span>
