@@ -5,7 +5,7 @@ import {
   HeartPulse, PhoneCall, Video, CheckCircle2, AlertTriangle, Mic, ChevronRight,
   X, Smartphone, Monitor,
 } from "lucide-react";
-import { addTask, completeTask, sendNote, useDayTasks } from "@/lib/dayStore";
+import { addTask, completeTask, resolveFall, sendNote, triggerFall, useDayTasks, useFallAlert } from "@/lib/dayStore";
 import { CallOverlay } from "@/components/CallOverlay";
 import { PhoneFrame } from "@/components/PhoneFrame";
 
@@ -19,8 +19,41 @@ export const Route = createFileRoute("/caregiver")({
   component: Caregiver,
 });
 
+function fallTime(at: number) {
+  return new Date(at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+}
+
+function FallBanner({ at, onCall, compact = false }: { at: number; onCall: () => void; compact?: boolean }) {
+  return (
+    <div className={`rounded-3xl border-2 border-destructive bg-[oklch(0.97_0.03_25)] ${compact ? "p-4" : "p-5"}`}>
+      <div className="flex items-center gap-2 text-destructive">
+        <AlertTriangle className="h-5 w-5 animate-pulse" />
+        <p className={`font-display font-semibold ${compact ? "text-base" : "text-lg"}`}>Possible fall detected</p>
+      </div>
+      <p className="mt-1 text-sm">
+        Margaret's watch detected a hard fall at <b>{fallTime(at)}</b>. She's being asked if she's okay.
+      </p>
+      <div className="mt-3 flex gap-2">
+        <button
+          onClick={onCall}
+          className="flex flex-1 items-center justify-center gap-2 rounded-full bg-destructive px-4 py-2 text-sm font-bold text-destructive-foreground active:scale-[0.98]"
+        >
+          <PhoneCall className="h-4 w-4" /> Call now
+        </button>
+        <button
+          onClick={resolveFall}
+          className="flex-1 rounded-full border border-border bg-card px-4 py-2 text-sm font-bold active:scale-[0.98]"
+        >
+          She's okay
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function Caregiver() {
   const tasks = useDayTasks();
+  const fall = useFallAlert();
   const done = tasks.filter((t) => t.status === "done").length;
   const skipped = tasks.filter((t) => t.status === "skipped");
   const ok = skipped.length === 0;
@@ -36,6 +69,7 @@ function Caregiver() {
         done={done}
         skipped={skipped}
         ok={ok}
+        fall={fall}
         call={call}
         setCall={setCall}
         onDashboard={() => setPhoneView(false)}
@@ -74,8 +108,8 @@ function Caregiver() {
                 aria-label="Notifications"
               >
                 <Bell className="h-5 w-5" />
-                {!ok && (
-                  <span className="absolute -right-0.5 -top-0.5 grid h-4 w-4 place-items-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">{skipped.length}</span>
+                {(!ok || fall) && (
+                  <span className="absolute -right-0.5 -top-0.5 grid h-4 w-4 place-items-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">{skipped.length + (fall ? 1 : 0)}</span>
                 )}
               </button>
               {bellOpen && (
@@ -84,10 +118,17 @@ function Caregiver() {
                     <p className="font-display font-semibold">Notifications</p>
                     <button onClick={() => setBellOpen(false)} aria-label="Close"><X className="h-4 w-4 text-muted-foreground" /></button>
                   </div>
-                  {ok ? (
+                  {ok && !fall ? (
                     <p className="text-sm text-muted-foreground">All caught up — Mom is on track today. ✅</p>
                   ) : (
                     <ul className="space-y-2">
+                      {fall && (
+                        <li className="flex items-center gap-2 rounded-xl bg-[oklch(0.97_0.03_25)] p-2.5 text-sm">
+                          <AlertTriangle className="h-4 w-4 shrink-0 text-destructive" />
+                          <span className="flex-1">Possible fall at <b>{fallTime(fall.at)}</b></span>
+                          <button onClick={resolveFall} className="rounded-full bg-primary px-2.5 py-1 text-xs font-bold text-primary-foreground">Resolve</button>
+                        </li>
+                      )}
                       {skipped.map((t) => (
                         <li key={t.id} className="flex items-center gap-2 rounded-xl bg-[oklch(0.97_0.03_25)] p-2.5 text-sm">
                           <AlertTriangle className="h-4 w-4 shrink-0 text-destructive" />
@@ -117,6 +158,12 @@ function Caregiver() {
       </header>
 
       <main className="mx-auto max-w-6xl px-6 py-8">
+        {fall && (
+          <div className="mb-6">
+            <FallBanner at={fall.at} onCall={() => setCall("voice")} />
+          </div>
+        )}
+
         {/* Hero: patient status */}
         <section className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
           <div className="rounded-3xl bg-gradient-to-br from-primary to-[oklch(0.68_0.11_220)] p-6 text-primary-foreground shadow-[var(--shadow-card)]">
@@ -225,6 +272,7 @@ function CaregiverPhone({
   done,
   skipped,
   ok,
+  fall,
   call,
   setCall,
   onDashboard,
@@ -233,6 +281,7 @@ function CaregiverPhone({
   done: number;
   skipped: ReturnType<typeof useDayTasks>;
   ok: boolean;
+  fall: ReturnType<typeof useFallAlert>;
   call: "voice" | "video" | null;
   setCall: (c: "voice" | "video" | null) => void;
   onDashboard: () => void;
@@ -302,6 +351,12 @@ function CaregiverPhone({
               </div>
             </div>
           </div>
+
+          {fall && (
+            <div className="mt-3">
+              <FallBanner at={fall.at} onCall={() => setCall("voice")} compact />
+            </div>
+          )}
 
           {/* Alert */}
           {!ok && (
@@ -509,6 +564,7 @@ function SendNoteCard() {
 function SafetyCard() {
   const [share, setShare] = useState(true);
   const [battery, setBattery] = useState(true);
+  const [fallDetection, setFallDetection] = useState(true);
   return (
     <Card title="Location & safety">
       <div className="rounded-2xl bg-gradient-to-br from-[oklch(0.94_0.06_145)] to-[oklch(0.97_0.03_145)] p-4">
@@ -516,8 +572,17 @@ function SafetyCard() {
         <p className="mt-1 font-display text-lg font-semibold">Home · Elm Street</p>
         <p className="text-xs text-muted-foreground">Updated 3 min ago</p>
       </div>
+      <Toggle label="Fall detection · Apple Watch" on={fallDetection} onClick={() => setFallDetection((v) => !v)} />
       <Toggle label="Share location" on={share} onClick={() => setShare((v) => !v)} />
       <Toggle label="Battery alerts" on={battery} onClick={() => setBattery((v) => !v)} />
+      {fallDetection && (
+        <button
+          onClick={triggerFall}
+          className="mt-3 w-full rounded-2xl border border-dashed border-border py-2 text-xs font-semibold text-muted-foreground transition hover:border-destructive hover:text-destructive"
+        >
+          Simulate a fall (demo)
+        </button>
+      )}
     </Card>
   );
 }

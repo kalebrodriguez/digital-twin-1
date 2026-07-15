@@ -172,6 +172,69 @@ export function useHomeNote(): HomeNote | null {
   return note;
 }
 
+// --- Fall detection (simulated watch event), synced the same way ---
+
+export type FallAlert = { at: number };
+
+const FALL_KEY = "digitaltwin-fall-v1";
+let cachedFall: FallAlert | null | undefined;
+
+function readFall(): FallAlert | null {
+  if (typeof window === "undefined") return null;
+  if (cachedFall !== undefined) return cachedFall;
+  try {
+    const raw = window.localStorage.getItem(FALL_KEY);
+    cachedFall = raw ? (JSON.parse(raw) as FallAlert) : null;
+  } catch {
+    cachedFall = null;
+  }
+  return cachedFall;
+}
+
+function writeFall(fall: FallAlert | null) {
+  cachedFall = fall;
+  try {
+    if (fall) window.localStorage.setItem(FALL_KEY, JSON.stringify(fall));
+    else window.localStorage.removeItem(FALL_KEY);
+  } catch {
+    // storage unavailable — in-memory state still works
+  }
+  getChannel()?.postMessage("update");
+  listeners.forEach((fn) => fn());
+}
+
+export function triggerFall() {
+  writeFall({ at: Date.now() });
+}
+
+export function resolveFall() {
+  writeFall(null);
+}
+
+export function useFallAlert(): FallAlert | null {
+  const [fall, setFall] = useState<FallAlert | null>(null);
+
+  useEffect(() => {
+    const update = () => {
+      cachedFall = undefined;
+      setFall(readFall());
+    };
+    update();
+    listeners.add(update);
+    getChannel();
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === FALL_KEY) update();
+    };
+    window.addEventListener("storage", onStorage);
+    return () => {
+      listeners.delete(update);
+      window.removeEventListener("storage", onStorage);
+    };
+  }, []);
+
+  return fall;
+}
+
 export function useDayTasks(): DayTask[] {
   // Start from the static list so server and first client render match,
   // then hydrate from storage and subscribe to local + cross-window updates.

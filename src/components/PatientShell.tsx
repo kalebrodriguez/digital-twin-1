@@ -3,6 +3,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { ChevronLeft, ShieldAlert } from "lucide-react";
 import { PatientNav } from "./PatientNav";
 import { PhoneFrame } from "./PhoneFrame";
+import { FallCheck } from "./FallCheck";
 
 export function PatientShell({
   title,
@@ -18,6 +19,7 @@ export function PatientShell({
   const pathname = useRouterState({ select: (r) => r.location.pathname });
   return (
     <div className="min-h-dvh bg-gradient-to-b from-accent/40 via-background to-background px-4 py-8">
+      <FallCheck />
       <div className="mx-auto mb-4 flex max-w-[400px] items-center justify-between text-sm text-muted-foreground">
         <span className="font-semibold">Patient view</span>
         <Link to="/caregiver" className="rounded-full border border-border bg-card px-3 py-1 font-semibold hover:bg-accent">
