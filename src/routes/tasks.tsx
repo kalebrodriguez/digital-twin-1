@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Check, X, Volume2, CheckCircle2 } from "lucide-react";
 import { PatientShell } from "@/components/PatientShell";
 import { completeTask, skipTask, useDayTasks } from "@/lib/dayStore";
+import { speak, stopSpeaking, useSpeakingId } from "@/lib/speech";
 
 export const Route = createFileRoute("/tasks")({
   head: () => ({ meta: [{ title: "Today — DigitalTwin" }, { name: "description", content: "Your day, one gentle step at a time." }] }),
@@ -11,6 +12,7 @@ export const Route = createFileRoute("/tasks")({
 
 function TasksPage() {
   const tasks = useDayTasks();
+  const speakingId = useSpeakingId();
   const [celebrate, setCelebrate] = useState<string | null>(null);
 
   const complete = (id: string) => {
@@ -51,8 +53,14 @@ function TasksPage() {
             </div>
           </div>
           <p className="mt-3 rounded-2xl bg-white/15 px-4 py-3 text-sm leading-relaxed">"{next.voice}"</p>
-          <button className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-white/20 py-2 text-sm font-semibold">
-            <Volume2 className="h-4 w-4" /> Play in Sarah's voice
+          <button
+            onClick={() =>
+              speakingId === next.id ? stopSpeaking() : speak(next.voice, next.id)
+            }
+            className={`mt-3 flex w-full items-center justify-center gap-2 rounded-2xl py-2 text-sm font-semibold transition active:scale-[0.98] ${speakingId === next.id ? "bg-white text-primary" : "bg-white/20"}`}
+          >
+            <Volume2 className={`h-4 w-4 ${speakingId === next.id ? "animate-pulse" : ""}`} />
+            {speakingId === next.id ? "Playing…" : "Play in Sarah's voice"}
           </button>
           <div className="mt-4 grid grid-cols-2 gap-3">
             <button
