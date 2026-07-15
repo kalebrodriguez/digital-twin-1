@@ -3,9 +3,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Bell, Plus, Pill, Calendar, MessageSquareHeart, MapPin, Battery,
   HeartPulse, PhoneCall, Video, CheckCircle2, AlertTriangle, Mic, ChevronRight,
-  PhoneOff, X,
+  X,
 } from "lucide-react";
 import { addTask, completeTask, sendNote, useDayTasks } from "@/lib/dayStore";
+import { CallOverlay } from "@/components/CallOverlay";
 
 export const Route = createFileRoute("/caregiver")({
   head: () => ({
@@ -28,7 +29,16 @@ function Caregiver() {
 
   return (
     <div className="min-h-dvh bg-background">
-      {call && <CallOverlay kind={call} onEnd={() => setCall(null)} />}
+      {call && (
+        <CallOverlay
+          name="Margaret (Mom)"
+          initial="M"
+          emoji="👵"
+          selfEmoji="👩"
+          kind={call}
+          onEnd={() => setCall(null)}
+        />
+      )}
 
       {/* Top bar */}
       <header className="sticky top-0 z-20 border-b border-border bg-background/90 backdrop-blur">
@@ -182,53 +192,6 @@ function Caregiver() {
           DigitalTwin — Helping memories stay connected.
         </p>
       </main>
-    </div>
-  );
-}
-
-/* ---------- Fake in-app call ---------- */
-
-function CallOverlay({ kind, onEnd }: { kind: "voice" | "video"; onEnd: () => void }) {
-  const [seconds, setSeconds] = useState(0);
-  const connected = seconds >= 2;
-
-  useEffect(() => {
-    const t = setInterval(() => setSeconds((s) => s + 1), 1000);
-    return () => clearInterval(t);
-  }, []);
-
-  const elapsed = Math.max(0, seconds - 2);
-  const mm = String(Math.floor(elapsed / 60)).padStart(1, "0");
-  const ss = String(elapsed % 60).padStart(2, "0");
-
-  return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[oklch(0.2_0.03_255/0.96)] p-6 text-white">
-      {kind === "video" && connected ? (
-        <div className="relative mb-6 grid aspect-video w-full max-w-xl place-items-center overflow-hidden rounded-3xl bg-gradient-to-br from-[oklch(0.45_0.08_255)] to-[oklch(0.3_0.05_255)]">
-          <span className="text-8xl">👵</span>
-          <div className="absolute bottom-3 right-3 grid h-20 w-14 place-items-center rounded-xl bg-[oklch(0.35_0.05_255)] text-3xl ring-2 ring-white/30">👩</div>
-        </div>
-      ) : (
-        <div className="relative mb-6">
-          <div className="grid h-28 w-28 place-items-center rounded-full bg-primary font-display text-4xl font-bold">M</div>
-          {!connected && (
-            <>
-              <span className="absolute inset-0 animate-ping rounded-full bg-primary/40" />
-              <span className="absolute -inset-3 animate-pulse rounded-full border-2 border-primary/40" />
-            </>
-          )}
-        </div>
-      )}
-      <p className="font-display text-2xl font-semibold">Margaret (Mom)</p>
-      <p className="mt-1 text-white/70">
-        {connected ? `${kind === "video" ? "Video call" : "On call"} · ${mm}:${ss}` : "Calling…"}
-      </p>
-      <button
-        onClick={onEnd}
-        className="mt-8 flex items-center gap-2 rounded-full bg-destructive px-6 py-3 font-bold text-destructive-foreground transition active:scale-[0.97]"
-      >
-        <PhoneOff className="h-5 w-5" /> End call
-      </button>
     </div>
   );
 }
