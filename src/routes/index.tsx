@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Sun, Cloud, Calendar, HeartPulse, Phone, BookHeart, MessageCircle, HelpCircle, Sparkles } from "lucide-react";
+import { Sun, Cloud, Calendar, HeartPulse, Phone, BookHeart, MessageCircle, HelpCircle, Sparkles, Brain } from "lucide-react";
 import { PatientShell } from "@/components/PatientShell";
 
 export const Route = createFileRoute("/")({
@@ -94,6 +94,18 @@ function PatientHome() {
             </Link>
           ))}
         </div>
+
+        <Link
+          to="/games"
+          className="mt-3 flex w-full items-center gap-3 rounded-2xl bg-card px-4 py-3 shadow-[var(--shadow-soft)] transition active:scale-[0.98]"
+        >
+          <div className="grid h-10 w-10 place-items-center rounded-xl bg-accent text-xl">🧠</div>
+          <div className="flex-1">
+            <span className="font-display text-base font-semibold">Brain Games</span>
+            <p className="text-xs text-muted-foreground">Fun exercises to keep your mind sharp</p>
+          </div>
+          <Brain className="h-5 w-5 text-primary opacity-70" />
+        </Link>
 
         <div className="mt-5 flex items-start gap-3 rounded-2xl bg-[oklch(0.96_0.05_90)] p-4 text-sm">
           <Sparkles className="mt-0.5 h-5 w-5 text-[oklch(0.6_0.14_60)]" />

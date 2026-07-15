@@ -13,6 +13,7 @@ import { Route as TasksRouteImport } from './routes/tasks'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as MemoryBookRouteImport } from './routes/memory-book'
 import { Route as LostRouteImport } from './routes/lost'
+import { Route as GamesRouteImport } from './routes/games'
 import { Route as EmergencyRouteImport } from './routes/emergency'
 import { Route as ContactsRouteImport } from './routes/contacts'
 import { Route as CheckinRouteImport } from './routes/checkin'
@@ -37,6 +38,11 @@ const MemoryBookRoute = MemoryBookRouteImport.update({
 const LostRoute = LostRouteImport.update({
   id: '/lost',
   path: '/lost',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GamesRoute = GamesRouteImport.update({
+  id: '/games',
+  path: '/games',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EmergencyRoute = EmergencyRouteImport.update({
@@ -71,6 +77,7 @@ export interface FileRoutesByFullPath {
   '/checkin': typeof CheckinRoute
   '/contacts': typeof ContactsRoute
   '/emergency': typeof EmergencyRoute
+  '/games': typeof GamesRoute
   '/lost': typeof LostRoute
   '/memory-book': typeof MemoryBookRoute
   '/messages': typeof MessagesRoute
@@ -82,6 +89,7 @@ export interface FileRoutesByTo {
   '/checkin': typeof CheckinRoute
   '/contacts': typeof ContactsRoute
   '/emergency': typeof EmergencyRoute
+  '/games': typeof GamesRoute
   '/lost': typeof LostRoute
   '/memory-book': typeof MemoryBookRoute
   '/messages': typeof MessagesRoute
@@ -94,6 +102,7 @@ export interface FileRoutesById {
   '/checkin': typeof CheckinRoute
   '/contacts': typeof ContactsRoute
   '/emergency': typeof EmergencyRoute
+  '/games': typeof GamesRoute
   '/lost': typeof LostRoute
   '/memory-book': typeof MemoryBookRoute
   '/messages': typeof MessagesRoute
@@ -107,6 +116,7 @@ export interface FileRouteTypes {
     | '/checkin'
     | '/contacts'
     | '/emergency'
+    | '/games'
     | '/lost'
     | '/memory-book'
     | '/messages'
@@ -118,6 +128,7 @@ export interface FileRouteTypes {
     | '/checkin'
     | '/contacts'
     | '/emergency'
+    | '/games'
     | '/lost'
     | '/memory-book'
     | '/messages'
@@ -129,6 +140,7 @@ export interface FileRouteTypes {
     | '/checkin'
     | '/contacts'
     | '/emergency'
+    | '/games'
     | '/lost'
     | '/memory-book'
     | '/messages'
@@ -141,6 +153,7 @@ export interface RootRouteChildren {
   CheckinRoute: typeof CheckinRoute
   ContactsRoute: typeof ContactsRoute
   EmergencyRoute: typeof EmergencyRoute
+  GamesRoute: typeof GamesRoute
   LostRoute: typeof LostRoute
   MemoryBookRoute: typeof MemoryBookRoute
   MessagesRoute: typeof MessagesRoute
@@ -175,6 +188,13 @@ declare module '@tanstack/react-router' {
       path: '/lost'
       fullPath: '/lost'
       preLoaderRoute: typeof LostRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/games': {
+      id: '/games'
+      path: '/games'
+      fullPath: '/games'
+      preLoaderRoute: typeof GamesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/emergency': {
@@ -221,6 +241,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckinRoute: CheckinRoute,
   ContactsRoute: ContactsRoute,
   EmergencyRoute: EmergencyRoute,
+  GamesRoute: GamesRoute,
   LostRoute: LostRoute,
   MemoryBookRoute: MemoryBookRoute,
   MessagesRoute: MessagesRoute,
