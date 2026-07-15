@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Sun, Cloud, Calendar, HeartPulse, Phone, BookHeart, MessageCircle, HelpCircle, Sparkles, Brain } from "lucide-react";
+import { Sun, Cloud, Calendar, HeartPulse, Phone, BookHeart, MessageCircle, HelpCircle, Sparkles, Brain, Heart } from "lucide-react";
 import { PatientShell } from "@/components/PatientShell";
+import { clearNote, useHomeNote } from "@/lib/dayStore";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -28,6 +29,7 @@ const favorites = [
 ];
 
 function PatientHome() {
+  const note = useHomeNote();
   const now = new Date();
   const time = now.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
   const date = now.toLocaleDateString([], { weekday: "long", month: "long", day: "numeric" });
@@ -43,6 +45,22 @@ function PatientHome() {
           Good morning,<br />Margaret <span className="inline-block">👋</span>
         </h1>
         <p className="mt-1 text-muted-foreground">{date}</p>
+
+        {/* Note from family (sent live from the caregiver dashboard) */}
+        {note && (
+          <div className="mt-5 rounded-3xl bg-[oklch(0.95_0.05_25)] p-5 shadow-[var(--shadow-soft)]">
+            <div className="flex items-center gap-2 text-sm font-bold text-[oklch(0.55_0.15_25)]">
+              <Heart className="h-4 w-4 fill-current" /> A note from {note.from}
+            </div>
+            <p className="mt-2 font-display text-lg leading-snug">{note.text}</p>
+            <button
+              onClick={clearNote}
+              className="mt-3 rounded-full bg-white px-4 py-2 text-sm font-bold shadow-[var(--shadow-soft)] active:scale-[0.98]"
+            >
+              Thank you, {note.from} ❤️
+            </button>
+          </div>
+        )}
 
         {/* What's next */}
         <Link

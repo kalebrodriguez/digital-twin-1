@@ -95,6 +95,83 @@ export function resetDay() {
   write(INITIAL_TASKS);
 }
 
+export function addTask(title: string, time: string, emoji = "📌") {
+  write([
+    ...read(),
+    {
+      id: `custom-${Date.now()}`,
+      emoji,
+      title,
+      time,
+      voice: `Hi Margaret, ${title.toLowerCase()} — Sarah added this for you.`,
+      status: "later",
+    },
+  ]);
+}
+
+// --- Note from caregiver to the patient's home screen, synced the same way ---
+
+export type HomeNote = { text: string; from: string; sentAt: number };
+
+const NOTE_KEY = "digitaltwin-note-v1";
+let cachedNote: HomeNote | null | undefined; // undefined = not read yet
+
+function readNote(): HomeNote | null {
+  if (typeof window === "undefined") return null;
+  if (cachedNote !== undefined) return cachedNote;
+  try {
+    const raw = window.localStorage.getItem(NOTE_KEY);
+    cachedNote = raw ? (JSON.parse(raw) as HomeNote) : null;
+  } catch {
+    cachedNote = null;
+  }
+  return cachedNote;
+}
+
+function writeNote(note: HomeNote | null) {
+  cachedNote = note;
+  try {
+    if (note) window.localStorage.setItem(NOTE_KEY, JSON.stringify(note));
+    else window.localStorage.removeItem(NOTE_KEY);
+  } catch {
+    // storage unavailable — in-memory state still works
+  }
+  getChannel()?.postMessage("update");
+  listeners.forEach((fn) => fn());
+}
+
+export function sendNote(text: string, from = "Sarah") {
+  writeNote({ text, from, sentAt: Date.now() });
+}
+
+export function clearNote() {
+  writeNote(null);
+}
+
+export function useHomeNote(): HomeNote | null {
+  const [note, setNote] = useState<HomeNote | null>(null);
+
+  useEffect(() => {
+    const update = () => {
+      cachedNote = undefined;
+      setNote(readNote());
+    };
+    update();
+    listeners.add(update);
+    getChannel();
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === NOTE_KEY) update();
+    };
+    window.addEventListener("storage", onStorage);
+    return () => {
+      listeners.delete(update);
+      window.removeEventListener("storage", onStorage);
+    };
+  }, []);
+
+  return note;
+}
+
 export function useDayTasks(): DayTask[] {
   // Start from the static list so server and first client render match,
   // then hydrate from storage and subscribe to local + cross-window updates.
