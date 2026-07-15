@@ -3,10 +3,11 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Bell, Plus, Pill, Calendar, MessageSquareHeart, MapPin, Battery,
   HeartPulse, PhoneCall, Video, CheckCircle2, AlertTriangle, Mic, ChevronRight,
-  X,
+  X, Smartphone, Monitor,
 } from "lucide-react";
 import { addTask, completeTask, sendNote, useDayTasks } from "@/lib/dayStore";
 import { CallOverlay } from "@/components/CallOverlay";
+import { PhoneFrame } from "@/components/PhoneFrame";
 
 export const Route = createFileRoute("/caregiver")({
   head: () => ({
@@ -26,6 +27,21 @@ function Caregiver() {
 
   const [call, setCall] = useState<"voice" | "video" | null>(null);
   const [bellOpen, setBellOpen] = useState(false);
+  const [phoneView, setPhoneView] = useState(false);
+
+  if (phoneView) {
+    return (
+      <CaregiverPhone
+        tasks={tasks}
+        done={done}
+        skipped={skipped}
+        ok={ok}
+        call={call}
+        setCall={setCall}
+        onDashboard={() => setPhoneView(false)}
+      />
+    );
+  }
 
   return (
     <div className="min-h-dvh bg-background">
@@ -90,6 +106,12 @@ function Caregiver() {
               )}
             </div>
             <Link to="/" className="rounded-full bg-accent px-4 py-2 text-sm font-semibold">← Patient view</Link>
+            <button
+              onClick={() => setPhoneView(true)}
+              className="flex items-center gap-1.5 rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold hover:bg-accent"
+            >
+              <Smartphone className="h-4 w-4" /> Phone app
+            </button>
           </div>
         </div>
       </header>
@@ -192,6 +214,159 @@ function Caregiver() {
           DigitalTwin — Helping memories stay connected.
         </p>
       </main>
+    </div>
+  );
+}
+
+/* ---------- Caregiver phone app view ---------- */
+
+function CaregiverPhone({
+  tasks,
+  done,
+  skipped,
+  ok,
+  call,
+  setCall,
+  onDashboard,
+}: {
+  tasks: ReturnType<typeof useDayTasks>;
+  done: number;
+  skipped: ReturnType<typeof useDayTasks>;
+  ok: boolean;
+  call: "voice" | "video" | null;
+  setCall: (c: "voice" | "video" | null) => void;
+  onDashboard: () => void;
+}) {
+  const [text, setText] = useState("Hi Mom, I'll be over at 12:30 with your favorite soup. 💛");
+  const [sent, setSent] = useState(false);
+
+  const send = () => {
+    if (!text.trim()) return;
+    sendNote(text.trim());
+    setSent(true);
+    setTimeout(() => setSent(false), 2500);
+  };
+
+  return (
+    <div className="min-h-dvh bg-gradient-to-b from-accent/40 via-background to-background px-4 py-8">
+      {call && (
+        <CallOverlay
+          name="Margaret (Mom)"
+          initial="M"
+          emoji="👵"
+          selfEmoji="👩"
+          kind={call}
+          onEnd={() => setCall(null)}
+        />
+      )}
+      <div className="mx-auto mb-4 flex max-w-[400px] items-center justify-between text-sm text-muted-foreground">
+        <span className="font-semibold">Caregiver view</span>
+        <div className="flex items-center gap-2">
+          <Link to="/" className="rounded-full border border-border bg-card px-3 py-1 font-semibold hover:bg-accent">
+            ← Patient view
+          </Link>
+          <button
+            onClick={onDashboard}
+            className="flex items-center gap-1 rounded-full border border-border bg-card px-3 py-1 font-semibold hover:bg-accent"
+          >
+            <Monitor className="h-3.5 w-3.5" /> Full dashboard
+          </button>
+        </div>
+      </div>
+      <PhoneFrame>
+        <div className="flex min-h-[780px] flex-col px-6 pb-8 pt-14">
+          <h1 className="font-display text-2xl font-semibold leading-tight">
+            Hi Sarah <span className="inline-block">👋</span>
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">Here's how Mom is doing today.</p>
+
+          {/* Status card */}
+          <div className="mt-4 rounded-3xl bg-gradient-to-br from-primary to-[oklch(0.68_0.11_220)] p-5 text-primary-foreground shadow-[var(--shadow-card)]">
+            <div className="flex items-center gap-3">
+              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-white/20 font-display text-xl font-bold">M</div>
+              <div className="flex-1">
+                <p className="font-display text-lg font-semibold leading-tight">Margaret</p>
+                <p className="text-xs opacity-90">Mom · 78</p>
+              </div>
+              <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold">
+                {ok ? "Doing well" : "Check in"}
+              </span>
+            </div>
+            <div className="mt-4">
+              <div className="flex items-center justify-between text-xs font-semibold">
+                <span className="opacity-90">Today's reminders</span>
+                <span>{done} of {tasks.length}</span>
+              </div>
+              <div className="mt-1.5 h-2 rounded-full bg-white/25">
+                <div className="h-full rounded-full bg-white transition-all" style={{ width: `${(done / tasks.length) * 100}%` }} />
+              </div>
+            </div>
+          </div>
+
+          {/* Alert */}
+          {!ok && (
+            <div className="mt-3 rounded-3xl border border-destructive/20 bg-[oklch(0.97_0.03_25)] p-4">
+              <div className="flex items-center gap-2 text-destructive">
+                <AlertTriangle className="h-4 w-4" />
+                <p className="text-sm font-bold">Mom skipped {skipped.map((t) => t.title).join(", ")}</p>
+              </div>
+              <button
+                onClick={() => skipped.forEach((t) => completeTask(t.id))}
+                className="mt-2 w-full rounded-full bg-destructive px-4 py-2 text-sm font-bold text-destructive-foreground active:scale-[0.98]"
+              >
+                Check in with her
+              </button>
+            </div>
+          )}
+
+          {/* Call actions */}
+          <div className="mt-3 grid grid-cols-2 gap-3">
+            <button
+              onClick={() => setCall("voice")}
+              className="flex items-center justify-center gap-2 rounded-2xl bg-secondary py-3 font-bold text-secondary-foreground transition active:scale-[0.98]"
+            >
+              <PhoneCall className="h-4 w-4" /> Call Mom
+            </button>
+            <button
+              onClick={() => setCall("video")}
+              className="flex items-center justify-center gap-2 rounded-2xl bg-primary py-3 font-bold text-primary-foreground transition active:scale-[0.98]"
+            >
+              <Video className="h-4 w-4" /> Video
+            </button>
+          </div>
+
+          {/* Schedule */}
+          <p className="mt-5 mb-2 text-sm font-semibold text-muted-foreground">Today's schedule</p>
+          <ul className="space-y-2">
+            {tasks.map((t) => (
+              <li key={t.id} className="flex items-center gap-3 rounded-2xl bg-card p-3 shadow-[var(--shadow-soft)]">
+                <span className="text-xl">{t.emoji}</span>
+                <div className="flex-1">
+                  <p className={`text-sm font-semibold ${t.status === "done" ? "text-muted-foreground line-through" : ""}`}>{t.title}</p>
+                  <p className="text-[11px] text-muted-foreground">{t.time}</p>
+                </div>
+                {t.status === "done" && <CheckCircle2 className="h-5 w-5 text-secondary" />}
+                {t.status === "skipped" && <span className="rounded-full bg-destructive/15 px-2 py-0.5 text-[10px] font-bold text-destructive">Skipped</span>}
+                {t.status === "next" && <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-bold text-primary">Now</span>}
+              </li>
+            ))}
+          </ul>
+
+          {/* Quick note */}
+          <p className="mt-5 mb-2 text-sm font-semibold text-muted-foreground">Send a note to her home screen</p>
+          <textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            className="h-20 w-full resize-none rounded-2xl border border-border bg-card p-3 text-sm shadow-[var(--shadow-soft)] outline-none focus:border-primary"
+          />
+          <button
+            onClick={send}
+            className={`mt-2 w-full rounded-2xl py-3 text-sm font-bold transition active:scale-[0.98] ${sent ? "bg-secondary text-secondary-foreground" : "bg-primary text-primary-foreground"}`}
+          >
+            {sent ? "Delivered to Mom's home screen ✓" : "Send"}
+          </button>
+        </div>
+      </PhoneFrame>
     </div>
   );
 }
