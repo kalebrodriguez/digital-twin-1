@@ -1,6 +1,7 @@
 # DigitalTwin
 
 🏆 **1st Place — Amgen 2026 STEM Entrepreneurship Camp pitch competition**
+
 🏆 **Best Presenters — Amgen 2026 STEM Entrepreneurship Camp pitch competition**
 
 **An AI daily companion for people with early-stage Alzheimer's — and real-time
